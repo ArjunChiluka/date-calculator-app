@@ -15,7 +15,24 @@ RUN chmod +x mvnw
 # 5️⃣ Copy source code
 COPY src src
 
-# 6️⃣ Build the project (skip tests for faster deploy)
+# 6️⃣ Build the project (skip tests for faster deploy)FROM eclipse-temurin:17-jdk-alpine
+
+WORKDIR /app
+
+# Copy all files
+COPY . .
+
+# Make Maven wrapper executable
+RUN chmod +x mvnw
+
+# Build the project
+RUN ./mvnw clean install -DskipTests
+
+# Expose port
+EXPOSE 8080
+
+# Start Spring Boot
+CMD ["./mvnw", "spring-boot:run"]
 RUN ./mvnw clean install -DskipTests
 
 # 7️⃣ Use minimal JDK runtime for final image
