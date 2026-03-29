@@ -1,50 +1,23 @@
-# 1️⃣ Use official Maven + JDK image
-FROM maven:3.9.4-eclipse-temurin-17 AS build
-
-# 2️⃣ Set working directory inside container
-WORKDIR /app
-
-# 3️⃣ Copy Maven wrapper and pom.xml first (for caching)
-COPY mvnw mvnw
-COPY .mvn .mvn
-COPY pom.xml .
-
-# 4️⃣ Make mvnw executable
-RUN chmod +x mvnw
-
-# 5️⃣ Copy source code
-COPY src src
-
-# 6️⃣ Build the project (skip tests for faster deploy)FROM eclipse-temurin:17-jdk-alpine
-
-WORKDIR /app
-
-# Copy all files
-COPY . .
-
-# Make Maven wrapper executable
-RUN chmod +x mvnw
-
-# Build the project
-RUN ./mvnw clean install -DskipTests
-
-# Expose port
-EXPOSE 8080
-
-# Start Spring Boot
-CMD ["./mvnw", "spring-boot:run"]
-RUN ./mvnw clean install -DskipTests
-
-# 7️⃣ Use minimal JDK runtime for final image
+# 1️⃣ Use an official Java 17 JDK image
 FROM eclipse-temurin:17-jdk-alpine
 
+# 2️⃣ Set working directory
 WORKDIR /app
 
-# 8️⃣ Copy built JAR from builder
-COPY --from=build /app/target/*.jar app.jar
+# 3️⃣ Copy Maven wrapper and project files
+COPY mvnw .
+COPY .mvn .mvn
+COPY pom.xml .
+COPY src src
 
-# 9️⃣ Expose default Spring Boot port
+# 4️⃣ Give execute permission to mvnw
+RUN chmod +x mvnw
+
+# 5️⃣ Build the project (skip tests for faster build)
+RUN ./mvnw clean install -DskipTests
+
+# 6️⃣ Expose default Spring Boot port
 EXPOSE 8080
 
-# 🔟 Run the application
-ENTRYPOINT ["java","-jar","app.jar"]
+# 7️⃣ Start the Spring Boot app
+CMD ["./mvnw", "spring-boot:run"]
