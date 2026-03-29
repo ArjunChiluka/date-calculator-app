@@ -1,20 +1,19 @@
-# 1️⃣ Use official Java 17 image
-FROM eclipse-temurin:17-jdk-alpine
+# Use Java 21 since Spring Boot 4 requires it
+FROM eclipse-temurin:21-jdk-alpine
 
-# 2️⃣ Set working directory
 WORKDIR /app
 
-# 3️⃣ Copy all backend files
+# Copy backend files
 COPY backend/ ./
 
-# 4️⃣ Make mvnw executable
+# Make mvnw executable
 RUN chmod +x mvnw
 
-# 5️⃣ Build the Spring Boot project (skip tests for faster deploy)
+# Build Spring Boot app (skip tests)
 RUN ./mvnw clean install -DskipTests
 
-# 6️⃣ Expose Spring Boot default port
+# Expose default Spring Boot port
 EXPOSE 8080
 
-# 7️⃣ Run the Spring Boot application
+# Start the app
 CMD ["./mvnw", "spring-boot:run"]
